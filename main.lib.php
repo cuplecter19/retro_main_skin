@@ -359,6 +359,60 @@ function save_main_stickers($stickers) {
     ) !== false;
 }
 
+function main_skin_default_asset() {
+    return array(
+        'id'          => '',
+        'image'       => '',
+        'alt'         => '',
+        'source_type' => 'url'
+    );
+}
+
+function main_skin_normalize_asset($asset) {
+    $normalized = array_replace(main_skin_default_asset(), is_array($asset) ? $asset : array());
+    $normalized['image']       = main_skin_image_url($normalized['image']);
+    $normalized['alt']         = main_skin_limit_text(isset($normalized['alt']) ? $normalized['alt'] : '', 100);
+    $normalized['source_type'] = ($normalized['source_type'] === 'file' || $normalized['source_type'] === 'upload') ? 'file' : 'url';
+    if (empty($normalized['id'])) {
+        $normalized['id'] = 'asset_' . main_skin_generate_id();
+    }
+    return $normalized;
+}
+
+function get_main_assets() {
+    $file = main_skin_storage_root_path() . '/assets.json';
+    if (!file_exists($file)) {
+        return array();
+    }
+    $assets = json_decode(file_get_contents($file), true);
+    if (!is_array($assets)) {
+        return array();
+    }
+    $normalized = array();
+    foreach ($assets as $asset) {
+        $asset = main_skin_normalize_asset($asset);
+        if (!empty($asset['image'])) {
+            $normalized[] = $asset;
+        }
+    }
+    return $normalized;
+}
+
+function save_main_assets($assets) {
+    main_skin_ensure_storage();
+    $normalized = array();
+    foreach ((array)$assets as $asset) {
+        $asset = main_skin_normalize_asset($asset);
+        if (!empty($asset['image'])) {
+            $normalized[] = $asset;
+        }
+    }
+    return file_put_contents(
+        main_skin_storage_root_path() . '/assets.json',
+        json_encode(array_values($normalized), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+    ) !== false;
+}
+
 function main_skin_limit_text($value, $length) {
     $value = trim(strip_tags((string)$value));
     if ($value === '') {
