@@ -76,8 +76,8 @@
       winOriginLeft  = rect.left - parentRect.left;
       winOriginTop   = rect.top  - parentRect.top;
       /* NOTE: do NOT apply left/right/transform here — wait until drag threshold is exceeded.
-         This prevents the mobile "slide right" bug caused by translateX(50%) still being active
-         when left is set from getBoundingClientRect on mousedown/touchstart. */
+         This prevents mobile position drift caused by setting left px while translateX(50%)
+         is still active, which would double the horizontal offset on each touch/mousedown. */
       if (!isTouch) { e.preventDefault(); }
     });
 

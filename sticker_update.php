@@ -83,7 +83,7 @@ switch ($action) {
                     'top'         => '50%',
                     'width'       => '160px',
                     'height'      => 'auto',
-                    'rotate'      => '0',
+                    'rotate'      => 0,
                     'z_index'     => $max_z,
                     'enabled'     => 1,
                     'alt'         => isset($_POST['alt']) ? $_POST['alt'] : ''
@@ -117,7 +117,7 @@ switch ($action) {
                     'top'         => '50%',
                     'width'       => '160px',
                     'height'      => 'auto',
-                    'rotate'      => '0',
+                    'rotate'      => 0,
                     'z_index'     => $max_z,
                     'enabled'     => 1,
                     'alt'         => isset($_POST['alt']) ? $_POST['alt'] : ''
@@ -294,7 +294,7 @@ switch ($action) {
             'top'         => '50%',
             'width'       => '160px',
             'height'      => 'auto',
-            'rotate'      => '0',
+            'rotate'      => 0,
             'z_index'     => $max_z + 1,
             'enabled'     => 1,
             'alt'         => $asset['alt']

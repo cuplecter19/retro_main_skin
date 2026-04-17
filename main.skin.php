@@ -155,8 +155,8 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
       </div>
 
       <div class="admin-tab-pane" id="tab-stickers">
-        <h3 class="admin-section-title">새 스티커 추가</h3>
         <form id="sticker-add-form" enctype="multipart/form-data">
+          <h3 class="admin-section-title">새 스티커 추가</h3>
           <input type="hidden" name="action" value="add_sticker">
           <input type="hidden" name="token" value="<?php echo main_skin_esc($main_skin_token); ?>">
           <div class="admin-field-row">
@@ -182,8 +182,8 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
         </form>
         <div id="sticker-add-msg" class="admin-msg" style="display:none;"></div>
 
-        <h3 class="admin-section-title">에셋 관리 <span class="admin-hint" style="display:inline;">(자주 쓰는 이미지를 저장해두고 배치 버튼으로 스티커 추가)</span></h3>
         <form id="asset-add-form" enctype="multipart/form-data">
+          <h3 class="admin-section-title">에셋 관리 <span class="admin-hint" style="display:inline;">(자주 쓰는 이미지를 저장해두고 배치 버튼으로 스티커 추가)</span></h3>
           <input type="hidden" name="action" value="add_asset">
           <input type="hidden" name="token" value="<?php echo main_skin_esc($main_skin_token); ?>">
           <div class="admin-field-row">
