@@ -2,11 +2,12 @@
 if (!defined('_GNUBOARD_')) exit;
 include_once(dirname(__FILE__) . '/main.lib.php');
 
-$main_skin_config = get_main_skin_config();
-$main_skin_banners = get_main_banners();
+$main_skin_config   = get_main_skin_config();
+$main_skin_banners  = get_main_banners();
 $main_skin_stickers = get_main_stickers();
+$main_skin_assets   = get_main_assets();
 $main_skin_is_admin = main_skin_is_admin();
-$main_skin_token = $main_skin_is_admin ? main_skin_get_token() : '';
+$main_skin_token    = $main_skin_is_admin ? main_skin_get_token() : '';
 $main_skin_latest_html = render_main_latest($main_skin_config);
 $window_title = !empty($main_skin_config['window_title']) ? $main_skin_config['window_title'] : '최신글';
 $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['banner_title'] : '배너';
@@ -19,35 +20,53 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
         if (empty($sticker['enabled']) || empty($sticker['image'])) {
             continue;
         }
-        $sticker_left = main_skin_length_to_number($sticker['left'], 100);
-        $sticker_top = main_skin_length_to_number($sticker['top'], 100);
+        $is_pct = (strpos($sticker['left'], '%') !== false && strpos($sticker['top'], '%') !== false);
+        $rotate_deg = main_skin_esc($sticker['rotate']);
+        $transform_val = $is_pct
+            ? 'translate(-50%,-50%) rotate(' . $rotate_deg . 'deg)'
+            : 'rotate(' . $rotate_deg . 'deg)';
+        $sticker_w = main_skin_esc($sticker['width']);
+        $sticker_h = main_skin_esc($sticker['height']);
     ?>
     <div class="retro-sticker<?php echo $main_skin_is_admin ? ' admin-sticker' : ''; ?>"
          id="sticker-<?php echo main_skin_esc($sticker['id']); ?>"
          data-id="<?php echo main_skin_esc($sticker['id']); ?>"
-         data-left="<?php echo $sticker_left; ?>"
-         data-top="<?php echo $sticker_top; ?>"
-         style="left:<?php echo main_skin_esc($sticker['left']); ?>;top:<?php echo main_skin_esc($sticker['top']); ?>;z-index:<?php echo (int)$sticker['z_index']; ?>;transform:rotate(<?php echo main_skin_esc($sticker['rotate']); ?>deg);">
+         data-rotate="<?php echo $rotate_deg; ?>"
+         data-z-index="<?php echo (int)$sticker['z_index']; ?>"
+         style="left:<?php echo main_skin_esc($sticker['left']); ?>;top:<?php echo main_skin_esc($sticker['top']); ?>;z-index:<?php echo (int)$sticker['z_index']; ?>;width:<?php echo $sticker_w; ?>;height:<?php echo $sticker_h; ?>;transform:<?php echo $transform_val; ?>;">
       <img src="<?php echo main_skin_esc($sticker['image']); ?>"
-           alt="<?php echo main_skin_esc($sticker['alt']); ?>"
-           style="width:<?php echo main_skin_esc($sticker['width']); ?>;height:<?php echo main_skin_esc($sticker['height']); ?>;">
+           alt="<?php echo main_skin_esc($sticker['alt']); ?>">
       <?php if ($main_skin_is_admin) { ?>
-      <button type="button" class="sticker-del-btn" data-id="<?php echo main_skin_esc($sticker['id']); ?>" title="스티커 삭제">×</button>
+      <div class="sticker-handles">
+        <button type="button" class="sticker-zup-btn"  data-id="<?php echo main_skin_esc($sticker['id']); ?>" title="z-index 올리기">▲</button>
+        <button type="button" class="sticker-zdown-btn" data-id="<?php echo main_skin_esc($sticker['id']); ?>" title="z-index 내리기">▼</button>
+        <button type="button" class="sticker-del-btn"  data-id="<?php echo main_skin_esc($sticker['id']); ?>" title="스티커 삭제">×</button>
+        <div class="sticker-rotate-handle" title="드래그하여 회전"></div>
+        <div class="sticker-resize-handle" title="드래그하여 크기 조절"></div>
+      </div>
       <?php } ?>
     </div>
     <?php } ?>
   </div>
 
   <?php if ($main_skin_is_admin) { ?>
-  <button type="button"
-          id="retro-admin-open-btn"
-          class="win95-window win95-action-btn admin-open-btn"
-          aria-label="스킨 관리 패널 열기"
-          aria-haspopup="dialog"
-          aria-controls="retro-admin-modal"
-          aria-expanded="false">
-    🔧 스킨 관리
-  </button>
+  <div id="retro-admin-buttons">
+    <button type="button"
+            id="retro-sticker-edit-btn"
+            class="win95-window win95-action-btn"
+            title="스티커 편집 모드 전환">
+      ✏️ 스티커 편집
+    </button>
+    <button type="button"
+            id="retro-admin-open-btn"
+            class="win95-window win95-action-btn"
+            aria-label="스킨 관리 패널 열기"
+            aria-haspopup="dialog"
+            aria-controls="retro-admin-modal"
+            aria-expanded="false">
+      🔧 스킨 관리
+    </button>
+  </div>
   <?php } ?>
 
   <div id="retro-main-layout">
@@ -136,27 +155,69 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
       </div>
 
       <div class="admin-tab-pane" id="tab-stickers">
+        <h3 class="admin-section-title">새 스티커 추가</h3>
         <form id="sticker-add-form" enctype="multipart/form-data">
           <input type="hidden" name="action" value="add_sticker">
           <input type="hidden" name="token" value="<?php echo main_skin_esc($main_skin_token); ?>">
-          <h3 class="admin-section-title">새 스티커 추가</h3>
-          <div class="admin-field-row"><label>이미지 종류</label><span><label><input type="radio" name="src_type" value="url" checked> URL</label> <label><input type="radio" name="src_type" value="upload"> 파일</label></span></div>
-          <div class="admin-field-row" id="sticker-url-row"><label>이미지 URL</label><input type="text" name="src_url" placeholder="https://example.com/sticker.gif" style="width:320px;"></div>
-          <div class="admin-field-row" id="sticker-file-row" style="display:none;"><label>이미지 파일</label><input type="file" name="sticker_file" accept="image/*"></div>
-          <div class="admin-field-grid">
-            <div class="admin-field-row"><label>left</label><input type="text" name="left" value="100px"></div>
-            <div class="admin-field-row"><label>top</label><input type="text" name="top" value="100px"></div>
-            <div class="admin-field-row"><label>width</label><input type="text" name="width" value="160px"></div>
-            <div class="admin-field-row"><label>height</label><input type="text" name="height" value="auto"></div>
-            <div class="admin-field-row"><label>rotate</label><input type="number" name="rotate" value="0" step="0.1"></div>
-            <div class="admin-field-row"><label>z-index</label><input type="number" name="z_index" value="20"></div>
+          <div class="admin-field-row">
+            <label>이미지 종류</label>
+            <span>
+              <label><input type="radio" name="src_type" value="url" checked> URL</label>
+              &nbsp;<label><input type="radio" name="src_type" value="upload"> 파일</label>
+            </span>
           </div>
-          <div class="admin-field-row"><label>설명</label><input type="text" name="alt" style="width:240px;"><label class="inline-check"><input type="checkbox" name="enabled" checked> 노출</label></div>
-          <div class="admin-field-row"><label></label><button type="submit" class="win95-action-btn">스티커 추가</button></div>
+          <div id="sticker-url-rows">
+            <div class="admin-field-row"><label>URL 1</label><input type="text" name="src_urls[]" style="width:300px;" placeholder="https://example.com/sticker.gif"></div>
+            <div class="admin-field-row"><label>URL 2</label><input type="text" name="src_urls[]" style="width:300px;"></div>
+            <div class="admin-field-row"><label>URL 3</label><input type="text" name="src_urls[]" style="width:300px;"></div>
+            <div class="admin-field-row"><label>URL 4</label><input type="text" name="src_urls[]" style="width:300px;"></div>
+            <div class="admin-field-row"><label>URL 5</label><input type="text" name="src_urls[]" style="width:300px;"></div>
+          </div>
+          <div id="sticker-file-row" style="display:none;">
+            <div class="admin-field-row"><label>이미지 파일</label><input type="file" name="sticker_files[]" accept="image/*" multiple></div>
+            <p class="admin-hint">최대 5개까지 선택 가능합니다.</p>
+          </div>
+          <div class="admin-field-row"><label>설명(alt)</label><input type="text" name="alt" style="width:200px;"></div>
+          <div class="admin-field-row"><label></label><button type="submit" class="win95-action-btn">스티커 추가 (화면 중앙 배치)</button></div>
         </form>
         <div id="sticker-add-msg" class="admin-msg" style="display:none;"></div>
 
+        <h3 class="admin-section-title">에셋 관리 <span class="admin-hint" style="display:inline;">(자주 쓰는 이미지를 저장해두고 배치 버튼으로 스티커 추가)</span></h3>
+        <form id="asset-add-form" enctype="multipart/form-data">
+          <input type="hidden" name="action" value="add_asset">
+          <input type="hidden" name="token" value="<?php echo main_skin_esc($main_skin_token); ?>">
+          <div class="admin-field-row">
+            <label>이미지 종류</label>
+            <span>
+              <label><input type="radio" name="src_type" value="url" checked> URL</label>
+              &nbsp;<label><input type="radio" name="src_type" value="upload"> 파일</label>
+            </span>
+          </div>
+          <div id="asset-url-row"><div class="admin-field-row"><label>이미지 URL</label><input type="text" name="src_url" style="width:300px;" placeholder="https://example.com/image.gif"></div></div>
+          <div id="asset-file-row" style="display:none;"><div class="admin-field-row"><label>이미지 파일</label><input type="file" name="asset_file" accept="image/*"></div></div>
+          <div class="admin-field-row"><label>설명(alt)</label><input type="text" name="alt" style="width:200px;"></div>
+          <div class="admin-field-row"><label></label><button type="submit" class="win95-action-btn">에셋 저장</button></div>
+        </form>
+        <div id="asset-add-msg" class="admin-msg" style="display:none;"></div>
+
+        <div id="admin-asset-list">
+          <?php if (empty($main_skin_assets)) { ?>
+          <p class="win95-no-posts">등록된 에셋이 없습니다.</p>
+          <?php } else { foreach ($main_skin_assets as $asset) { ?>
+          <div class="admin-asset-item" id="admin-asset-<?php echo main_skin_esc($asset['id']); ?>">
+            <img src="<?php echo main_skin_esc($asset['image']); ?>" alt="<?php echo main_skin_esc($asset['alt']); ?>" class="admin-asset-thumb">
+            <span class="admin-asset-alt"><?php echo main_skin_esc($asset['alt']); ?></span>
+            <div class="admin-item-actions" style="flex-direction:row;">
+              <button type="button" class="win95-action-btn asset-place-btn" data-id="<?php echo main_skin_esc($asset['id']); ?>">배치</button>
+              <button type="button" class="win95-action-btn asset-del-btn"   data-id="<?php echo main_skin_esc($asset['id']); ?>">삭제</button>
+            </div>
+          </div>
+          <?php } } ?>
+        </div>
+        <div id="asset-msg" class="admin-msg" style="display:none;"></div>
+
         <h3 class="admin-section-title">등록된 스티커</h3>
+        <p class="admin-hint">스티커 편집 모드에서 화면 위 핸들로 이동·크기·회전·z-index를 직접 조절하세요.</p>
         <div id="admin-sticker-list">
           <?php if (empty($main_skin_stickers)) { ?>
           <p class="win95-no-posts">등록된 스티커가 없습니다.</p>
@@ -168,15 +229,7 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
             <img src="<?php echo main_skin_esc($sticker['image']); ?>" alt="<?php echo main_skin_esc($sticker['alt']); ?>" class="admin-sticker-thumb">
             <div class="admin-item-fields">
               <div class="admin-inline-fields">
-                <input type="text" name="left" value="<?php echo main_skin_esc($sticker['left']); ?>" placeholder="left">
-                <input type="text" name="top" value="<?php echo main_skin_esc($sticker['top']); ?>" placeholder="top">
-                <input type="text" name="width" value="<?php echo main_skin_esc($sticker['width']); ?>" placeholder="width">
-                <input type="text" name="height" value="<?php echo main_skin_esc($sticker['height']); ?>" placeholder="height">
-              </div>
-              <div class="admin-inline-fields">
-                <input type="number" step="0.1" name="rotate" value="<?php echo main_skin_esc($sticker['rotate']); ?>" placeholder="rotate">
-                <input type="number" name="z_index" value="<?php echo (int)$sticker['z_index']; ?>" placeholder="z-index">
-                <input type="text" name="alt" value="<?php echo main_skin_esc($sticker['alt']); ?>" placeholder="설명">
+                <input type="text" name="alt" value="<?php echo main_skin_esc($sticker['alt']); ?>" placeholder="설명(alt)" style="min-width:160px;">
                 <label class="inline-check"><input type="checkbox" name="enabled"<?php echo !empty($sticker['enabled']) ? ' checked' : ''; ?>> 노출</label>
               </div>
             </div>
@@ -188,7 +241,6 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
           <?php } } ?>
         </div>
         <div id="sticker-edit-msg" class="admin-msg" style="display:none;"></div>
-        <p class="admin-hint">드래그하면 left/top 이 px 기준으로 즉시 저장됩니다. width/height 에는 px, %, auto 를 사용할 수 있습니다.</p>
       </div>
 
       <div class="admin-tab-pane" id="tab-images" style="display:none;">
