@@ -75,9 +75,6 @@
       var parentRect = winEl.offsetParent()[0].getBoundingClientRect();
       winOriginLeft  = rect.left - parentRect.left;
       winOriginTop   = rect.top  - parentRect.top;
-      /* NOTE: do NOT apply left/right/transform here — wait until drag threshold is exceeded.
-         This prevents mobile position drift caused by setting left px while translateX(50%)
-         is still active, which would double the horizontal offset on each touch/mousedown. */
       if (!isTouch) { e.preventDefault(); }
     });
 
@@ -90,8 +87,6 @@
       var dy = clientY - winStartY;
       if (!winMoved && Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
       if (!winMoved) {
-        /* First real drag movement: switch from CSS-centered positioning to absolute px.
-           Apply transform:none BEFORE setting left to avoid the 50% translation doubling. */
         winEl.css({ transform: 'none', left: winOriginLeft + 'px', top: winOriginTop + 'px', right: 'auto', position: 'absolute' });
         winMoved = true;
       }
@@ -108,7 +103,6 @@
       winDragging = false;
       winEl.removeClass('is-win-dragging');
       if (!winMoved && flipper.length && flipEnabled) {
-        /* Tap without drag: toggle flip, restore the CSS-centered position */
         flipper.toggleClass('flipped');
         syncFlipState(flipper.hasClass('flipped'));
       }
@@ -140,7 +134,7 @@
     $('#' + $(this).data('tab')).show();
   });
 
-  /* ── 패럴랙스 마우스 효과 ── */
+  /* ── 패럴랙스 마우스 효과 (rAF 최적화) ── */
   var parallaxLayers = $('.parallax-layer');
   if (parallaxLayers.length) {
     var PARALLAX_FACTORS = {
@@ -178,8 +172,16 @@
       });
     }
 
+    var rafPending = false;
     $(document).on('mousemove.parallax', function (e) {
-      updateParallax(e.clientX, e.clientY);
+      if (rafPending) return;
+      var cx = e.clientX;
+      var cy = e.clientY;
+      rafPending = true;
+      requestAnimationFrame(function () {
+        updateParallax(cx, cy);
+        rafPending = false;
+      });
     });
   }
 
@@ -270,7 +272,6 @@
     dragStartX = e.clientX;
     dragStartY = e.clientY;
 
-    /* Convert current (possibly %-based) position to absolute px */
     var rect       = dragging[0].getBoundingClientRect();
     var parentRect = dragging.offsetParent()[0].getBoundingClientRect();
     originLeft = rect.left - parentRect.left;
@@ -323,7 +324,6 @@
     resizeOriginW = resizing.outerWidth();
     resizeOriginH = resizing.outerHeight();
 
-    /* Convert to px before resizing (may be % positioned) */
     var rect       = resizing[0].getBoundingClientRect();
     var parentRect = resizing.offsetParent()[0].getBoundingClientRect();
     var rotate     = parseFloat(resizing.attr('data-rotate') || 0);
@@ -371,13 +371,11 @@
     e.preventDefault();
     rotating = $(this).closest('.admin-sticker');
 
-    /* Convert to px before rotating */
     var rect       = rotating[0].getBoundingClientRect();
     var parentRect = rotating.offsetParent()[0].getBoundingClientRect();
     var curRotate  = parseFloat(rotating.attr('data-rotate') || 0);
     rotating.css({ left: (rect.left - parentRect.left) + 'px', top: (rect.top - parentRect.top) + 'px', transform: 'rotate(' + curRotate + 'deg)' });
 
-    /* Reread after CSS change */
     var rect2      = rotating[0].getBoundingClientRect();
     rotateCenterX  = rect2.left + rect2.width  / 2;
     rotateCenterY  = rect2.top  + rect2.height / 2;
