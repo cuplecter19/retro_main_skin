@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+/* VT323 폰트는 main.skin.php에서 preload로 로딩합니다 */
 
 :root {
   --win95-bg: #c0c0c0;
@@ -27,7 +27,7 @@
 .retro-polaroid { position: absolute; width: 780px; max-width: 100%; background: #fff; padding: 18px 18px 32px; box-shadow: 0 18px 34px rgba(0,0,0,.22); box-sizing: border-box; }
 .polaroid-primary { top: -50px; left: 0; z-index: 3; }
 .polaroid-secondary { top: 320px; left: var(--retro-polaroid-secondary-left); z-index: 2; }
-.retro-polaroid img { width: 100%; height: clamp(180px, 25vw, 260px); object-fit: cover; }
+.retro-polaroid img, .retro-polaroid video { width: 100%; height: clamp(180px, 25vw, 260px); object-fit: cover; }
 .polaroid-placeholder { height: clamp(180px, 25vw, 260px); background: #eee; }
 .polaroid-caption { margin: 14px 0 0; color: #333; text-align: center; font-family: var(--font-retro); font-size: 24px; line-height: 1; }
 .win95-window { background: var(--win95-bg); border: 2px solid; border-color: var(--win95-light) var(--win95-dark) var(--win95-dark) var(--win95-light); box-sizing: border-box; font-family: var(--font-ui); }
@@ -35,7 +35,7 @@
 .win95-title-text { flex: 1; font-size: 12px; font-weight: bold; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .win95-title-hint { font-size: 11px; opacity: .75; }
 .win95-buttons { display: flex; gap: 2px; }
-.win95-btn, .win95-action-btn, .admin-tab, .admin-item-actions select { background: var(--win95-bg); border: 1px solid; border-color: var(--win95-light) var(--win95-dark) var(--win95-dark) var(--win95-light); }
+.win95-btn, .win95-action-btn, .admin-tab, .admin-item-actions select { background: var(--win95-bg); border: 1px solid; border-color: var(--win95-light) var(--win95-dark) var(--win95-dark) var(--win95-light); font-family: var(--font-ui); }
 .win95-btn { width: 16px; height: 14px; display: inline-flex; align-items: center; justify-content: center; color: #000; font-size: 10px; }
 .win95-action-btn { padding: 3px 10px; font-size: 12px; cursor: pointer; }
 #retro-win95-window {
@@ -57,7 +57,7 @@
 .win95-front { z-index: 2; }
 .win95-back { transform: rotateY(180deg); }
 .win95-face-window { height:fit-content; box-shadow: 0 20px 34px rgba(0,0,0,.22); }
-.win95-inner-border { margin: 4px; height:fit-content; padding: 8px; background: #fff; border: 1px solid; border-color: var(--win95-dark) var(--win95-light) var(--win95-light) var(--win95-dark); box-sizing: border-box; overflow: hidden; }
+.win95-inner-border { margin: 4px; height:fit-content; padding: 8px; background: #fff; border: 1px solid; border-color: var(--win95-dark) var(--win95-light) var(--win95-light) var(--win95-dark); box-sizing: border-box; }
 /* ── 최신글 섹션 ── */
 .win95-board-section { margin-bottom: 10px; }
 .win95-section-label { display: inline-block; margin-bottom: 4px; padding: 2px 5px; background: var(--win95-blue); color: #fff; font-size: 11px; }
@@ -155,7 +155,7 @@
   transform: translateY(0);
 }
 
-/* ── 윈도우 드래그 (누구나) ── */
+/* ── 윈도우    래그 (누구나) ── */
 #retro-win95-window.is-win-dragging {
   cursor: grabbing;
   opacity: .92;
@@ -293,7 +293,7 @@
 .admin-section-title { margin: 12px 0 8px; padding-bottom: 2px; border-bottom: 1px solid #888; font-size: 12px; }
 .admin-field-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; flex-wrap: wrap; font-size: 12px; }
 .admin-field-row label { width: 120px; font-weight: bold; }
-.admin-field-row input[type='text'], .admin-field-row input[type='number'], .admin-field-row select, .admin-inline-fields input, .admin-inline-fields select { padding: 3px 4px; border: 1px solid; border-color: var(--win95-dark) var(--win95-light) var(--win95-light) var(--win95-dark); background: #fff; font-size: 12px; box-sizing: border-box; }
+.admin-field-row input[type='text'], .admin-field-row input[type='number'], .admin-field-row select, .admin-inline-fields input, .admin-inline-fields select { padding: 3px 4px; border: 1px solid; border-color: var(--win95-dark) var(--win95-light) var(--win95-light) var(--win95-dark); font-family: var(--font-ui); font-size: 12px; }
 .admin-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
 .admin-preview-img, .admin-sticker-thumb { width: 72px; height: 72px; object-fit: contain; background: #fff; border: 1px solid #ccc; }
 .admin-none { color: #888; font-style: italic; }
@@ -313,6 +313,9 @@
 .admin-asset-item { display: flex; align-items: center; gap: 10px; padding: 6px 4px; border-bottom: 1px dotted #bbb; }
 .admin-asset-thumb { width: 56px; height: 56px; object-fit: contain; background: #fff; border: 1px solid #ccc; flex-shrink: 0; }
 .admin-asset-alt { flex: 1; font-size: 12px; color: #444; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* ── 관리자 video 미리보기 ── */
+video.admin-preview-img { width: 72px; height: 72px; object-fit: contain; background: #000; border: 1px solid #ccc; }
 
 @media (max-width: 1180px) {
   #retro-main-wrapper, #retro-main-layout, #retro-content-row { min-height: auto; }
@@ -340,7 +343,7 @@
 @media (max-width: 720px) {
   #retro-content-row { padding-top: 84px; }
   .retro-polaroid { padding: 14px 14px 22px; }
-  .retro-polaroid img, .polaroid-placeholder { height: 180px; }
+  .retro-polaroid img, .retro-polaroid video, .polaroid-placeholder { height: 180px; }
   .win95-post-list a { max-width: 180px; }
   .admin-field-grid { grid-template-columns: 1fr; }
   .admin-field-row label { width: auto; }
