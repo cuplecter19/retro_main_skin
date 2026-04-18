@@ -140,6 +140,49 @@
     $('#' + $(this).data('tab')).show();
   });
 
+  /* ── 패럴랙스 마우스 효과 ── */
+  var parallaxLayers = $('.parallax-layer');
+  if (parallaxLayers.length) {
+    var PARALLAX_FACTORS = {
+      'parallax-fg-layer': 0.04,
+      'parallax-ng-layer': 0.025,
+      'parallax-bg-layer': 0.01
+    };
+
+    function updateParallax(clientX, clientY) {
+      var centerX = window.innerWidth / 2;
+      var centerY = window.innerHeight / 2;
+      var deltaX = clientX - centerX;
+      var deltaY = clientY - centerY;
+
+      parallaxLayers.each(function () {
+        var layer = $(this);
+        var img = layer.find('img');
+        if (!img.length) return;
+
+        var factor = PARALLAX_FACTORS[this.id] || 0.02;
+        var moveX = -deltaX * factor;
+        var moveY = -deltaY * factor;
+
+        var posV = layer.attr('data-pos-v') || 'center';
+        var posH = layer.attr('data-pos-h') || 'center';
+        var offsetX = parseFloat(layer.attr('data-offset-x') || 0);
+        var offsetY = parseFloat(layer.attr('data-offset-y') || 0);
+
+        var parts = [];
+        if (posH === 'center') parts.push('translateX(-50%)');
+        if (posV === 'center') parts.push('translateY(-50%)');
+        parts.push('translate(' + (offsetX + moveX) + 'px,' + (offsetY + moveY) + 'px)');
+
+        img.css('transform', parts.join(' '));
+      });
+    }
+
+    $(document).on('mousemove.parallax', function (e) {
+      updateParallax(e.clientX, e.clientY);
+    });
+  }
+
   /* ── 이하 관리자 전용 ── */
   if (!IS_ADMIN) {
     return;
@@ -522,6 +565,28 @@
       showMsg('#banner-add-msg', '배너가 삭제되었습니다.', true);
       reloadSoon();
     }, function (msg) { showMsg('#banner-add-msg', msg, false); });
+  });
+
+  /* ── 패럴랙스 설정 ── */
+  $('#config-parallax-form').on('submit', function (e) {
+    e.preventDefault();
+    ajaxPost(SKIN_URL + '/config_update.php', new FormData(this), function () {
+      showMsg('#config-parallax-msg', '패럴랙스 설정이 저장되었습니다.', true);
+      reloadSoon();
+    }, function (msg) { showMsg('#config-parallax-msg', msg, false); });
+  });
+
+  $(document).on('click', '.parallax-del-btn', function () {
+    var layer = $(this).data('layer');
+    if (!layer || !window.confirm('이 레이어 이미지를 삭제하시겠습니까?')) return;
+    var fd = new FormData();
+    fd.append('action', 'delete_parallax_image');
+    fd.append('token', TOKEN);
+    fd.append('layer', layer);
+    ajaxPost(SKIN_URL + '/config_update.php', fd, function () {
+      showMsg('#config-parallax-msg', '이미지가 삭제되었습니다.', true);
+      reloadSoon();
+    }, function (msg) { showMsg('#config-parallax-msg', msg, false); });
   });
 
 }(jQuery));

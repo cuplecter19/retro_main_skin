@@ -15,6 +15,18 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
 <link rel="stylesheet" href="<?php echo main_skin_esc(MAIN_SKIN_URL); ?>/main.css">
 
 <div id="retro-main-wrapper">
+  <?php if (!empty($main_skin_config['parallax_bg_image'])) { ?>
+  <div id="parallax-bg-layer" class="parallax-layer parallax-bg-layer"
+       data-pos-v="<?php echo main_skin_esc($main_skin_config['parallax_bg_pos_v']); ?>"
+       data-pos-h="<?php echo main_skin_esc($main_skin_config['parallax_bg_pos_h']); ?>"
+       data-offset-x="<?php echo (int)$main_skin_config['parallax_bg_offset_x']; ?>"
+       data-offset-y="<?php echo (int)$main_skin_config['parallax_bg_offset_y']; ?>"
+       aria-hidden="true">
+    <img src="<?php echo main_skin_esc($main_skin_config['parallax_bg_image']); ?>"
+         alt=""
+         style="<?php echo main_skin_parallax_img_style($main_skin_config, 'parallax_bg'); ?>">
+  </div>
+  <?php } ?>
   <div id="retro-sticker-overlay" aria-hidden="true">
     <?php foreach ($main_skin_stickers as $sticker) {
         if (empty($sticker['enabled']) || empty($sticker['image'])) {
@@ -138,6 +150,32 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
     </div>
   </div>
 
+  <?php if (!empty($main_skin_config['parallax_ng_image'])) { ?>
+  <div id="parallax-ng-layer" class="parallax-layer parallax-above-layer"
+       data-pos-v="<?php echo main_skin_esc($main_skin_config['parallax_ng_pos_v']); ?>"
+       data-pos-h="<?php echo main_skin_esc($main_skin_config['parallax_ng_pos_h']); ?>"
+       data-offset-x="<?php echo (int)$main_skin_config['parallax_ng_offset_x']; ?>"
+       data-offset-y="<?php echo (int)$main_skin_config['parallax_ng_offset_y']; ?>"
+       aria-hidden="true">
+    <img src="<?php echo main_skin_esc($main_skin_config['parallax_ng_image']); ?>"
+         alt=""
+         style="<?php echo main_skin_parallax_img_style($main_skin_config, 'parallax_ng'); ?>">
+  </div>
+  <?php } ?>
+
+  <?php if (!empty($main_skin_config['parallax_fg_image'])) { ?>
+  <div id="parallax-fg-layer" class="parallax-layer parallax-above-layer"
+       data-pos-v="<?php echo main_skin_esc($main_skin_config['parallax_fg_pos_v']); ?>"
+       data-pos-h="<?php echo main_skin_esc($main_skin_config['parallax_fg_pos_h']); ?>"
+       data-offset-x="<?php echo (int)$main_skin_config['parallax_fg_offset_x']; ?>"
+       data-offset-y="<?php echo (int)$main_skin_config['parallax_fg_offset_y']; ?>"
+       aria-hidden="true">
+    <img src="<?php echo main_skin_esc($main_skin_config['parallax_fg_image']); ?>"
+         alt=""
+         style="<?php echo main_skin_parallax_img_style($main_skin_config, 'parallax_fg'); ?>">
+  </div>
+  <?php } ?>
+
   <?php if ($main_skin_is_admin) { ?>
   <div id="retro-admin-modal" class="admin-modal" hidden>
     <div class="admin-modal-backdrop" data-admin-close="true"></div>
@@ -151,6 +189,7 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
       <div class="admin-tabs">
         <button type="button" class="admin-tab active" data-tab="tab-stickers">🎨 스티커</button>
         <button type="button" class="admin-tab" data-tab="tab-images">📷 폴라로이드</button>
+        <button type="button" class="admin-tab" data-tab="tab-parallax">🏔️ 패럴랙스</button>
         <button type="button" class="admin-tab" data-tab="tab-window">🪟 최신글/배너</button>
       </div>
 
@@ -266,6 +305,63 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
           <div class="admin-field-row"><label></label><button type="submit" class="win95-action-btn">이미지 설정 저장</button></div>
         </form>
         <div id="config-images-msg" class="admin-msg" style="display:none;"></div>
+      </div>
+
+      <div class="admin-tab-pane" id="tab-parallax" style="display:none;">
+        <form id="config-parallax-form" enctype="multipart/form-data">
+          <input type="hidden" name="action" value="update_parallax">
+          <input type="hidden" name="token" value="<?php echo main_skin_esc($main_skin_token); ?>">
+          <p class="admin-hint">마우스 움직임에 따라 각 레이어가 반대 방향으로 이동합니다. 초근경이 가장 크게, 원경이 가장 작게 움직입니다.</p>
+
+          <?php
+          $parallax_layers = array(
+              'fg' => array('label' => '초근경 (Foreground)', 'desc' => '메인 레이아웃 위 — 가장 크게 움직임'),
+              'ng' => array('label' => '근경 (Near-ground)', 'desc' => '메인 레이아웃 위 — 중간 정도 움직임'),
+              'bg' => array('label' => '원경 (Background)', 'desc' => '메인 레이아웃 뒤 — 가장 작게 움직임')
+          );
+          foreach ($parallax_layers as $pl_key => $pl_info) {
+              $img_key = 'parallax_' . $pl_key . '_image';
+              $src_key = 'parallax_' . $pl_key . '_source_type';
+              $pv_key = 'parallax_' . $pl_key . '_pos_v';
+              $ph_key = 'parallax_' . $pl_key . '_pos_h';
+              $ox_key = 'parallax_' . $pl_key . '_offset_x';
+              $oy_key = 'parallax_' . $pl_key . '_offset_y';
+          ?>
+          <h3 class="admin-section-title"><?php echo main_skin_esc($pl_info['label']); ?> <span class="admin-hint" style="display:inline;">(<?php echo main_skin_esc($pl_info['desc']); ?>)</span></h3>
+          <div class="admin-field-row">
+            <label>현재 이미지</label>
+            <?php if (!empty($main_skin_config[$img_key])) { ?>
+            <img src="<?php echo main_skin_esc($main_skin_config[$img_key]); ?>" class="admin-preview-img" id="parallax-preview-<?php echo $pl_key; ?>">
+            <button type="button" class="win95-action-btn parallax-del-btn" data-layer="<?php echo $pl_key; ?>">삭제</button>
+            <?php } else { ?>
+            <span class="admin-none" id="parallax-preview-<?php echo $pl_key; ?>">없음</span>
+            <?php } ?>
+          </div>
+          <div class="admin-field-row"><label>이미지 URL</label><input type="text" name="parallax_<?php echo $pl_key; ?>_url" value="<?php echo main_skin_esc(isset($main_skin_config[$img_key]) ? $main_skin_config[$img_key] : ''); ?>" style="width:320px;"></div>
+          <div class="admin-field-row"><label>업로드</label><input type="file" name="parallax_<?php echo $pl_key; ?>_file" accept="image/*"></div>
+          <div class="admin-field-row">
+            <label>세로 위치</label>
+            <select name="parallax_<?php echo $pl_key; ?>_pos_v">
+              <option value="top"<?php echo (isset($main_skin_config[$pv_key]) && $main_skin_config[$pv_key] === 'top') ? ' selected' : ''; ?>>상단</option>
+              <option value="center"<?php echo (!isset($main_skin_config[$pv_key]) || $main_skin_config[$pv_key] === 'center') ? ' selected' : ''; ?>>중앙</option>
+              <option value="bottom"<?php echo (isset($main_skin_config[$pv_key]) && $main_skin_config[$pv_key] === 'bottom') ? ' selected' : ''; ?>>하단</option>
+            </select>
+          </div>
+          <div class="admin-field-row">
+            <label>가로 위치</label>
+            <select name="parallax_<?php echo $pl_key; ?>_pos_h">
+              <option value="left"<?php echo (isset($main_skin_config[$ph_key]) && $main_skin_config[$ph_key] === 'left') ? ' selected' : ''; ?>>좌측</option>
+              <option value="center"<?php echo (!isset($main_skin_config[$ph_key]) || $main_skin_config[$ph_key] === 'center') ? ' selected' : ''; ?>>중앙</option>
+              <option value="right"<?php echo (isset($main_skin_config[$ph_key]) && $main_skin_config[$ph_key] === 'right') ? ' selected' : ''; ?>>우측</option>
+            </select>
+          </div>
+          <div class="admin-field-row"><label>가로 미세조정 (px)</label><input type="number" name="parallax_<?php echo $pl_key; ?>_offset_x" value="<?php echo (int)(isset($main_skin_config[$ox_key]) ? $main_skin_config[$ox_key] : 0); ?>" style="width:80px;"></div>
+          <div class="admin-field-row"><label>세로 미세조정 (px)</label><input type="number" name="parallax_<?php echo $pl_key; ?>_offset_y" value="<?php echo (int)(isset($main_skin_config[$oy_key]) ? $main_skin_config[$oy_key] : 0); ?>" style="width:80px;"></div>
+          <?php } ?>
+
+          <div class="admin-field-row"><label></label><button type="submit" class="win95-action-btn">패럴랙스 설정 저장</button></div>
+        </form>
+        <div id="config-parallax-msg" class="admin-msg" style="display:none;"></div>
       </div>
 
       <div class="admin-tab-pane" id="tab-window" style="display:none;">

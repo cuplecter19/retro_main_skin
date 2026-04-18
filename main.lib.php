@@ -36,7 +36,7 @@ function main_skin_storage_root_url() {
 }
 
 function main_skin_asset_types() {
-    return array('visual', 'polaroid', 'banner', 'sticker');
+    return array('visual', 'polaroid', 'banner', 'sticker', 'parallax');
 }
 
 function main_skin_asset_dir($type) {
@@ -98,7 +98,25 @@ function main_skin_default_config() {
         'window_title' => '최신글',
         'banner_title' => '배너',
         'latest_rows' => 8,
-        'latest_boards' => 'free'
+        'latest_boards' => 'free',
+        'parallax_fg_image' => '',
+        'parallax_fg_source_type' => 'url',
+        'parallax_fg_pos_v' => 'center',
+        'parallax_fg_pos_h' => 'center',
+        'parallax_fg_offset_x' => 0,
+        'parallax_fg_offset_y' => 0,
+        'parallax_ng_image' => '',
+        'parallax_ng_source_type' => 'url',
+        'parallax_ng_pos_v' => 'center',
+        'parallax_ng_pos_h' => 'center',
+        'parallax_ng_offset_x' => 0,
+        'parallax_ng_offset_y' => 0,
+        'parallax_bg_image' => '',
+        'parallax_bg_source_type' => 'url',
+        'parallax_bg_pos_v' => 'center',
+        'parallax_bg_pos_h' => 'center',
+        'parallax_bg_offset_x' => 0,
+        'parallax_bg_offset_y' => 0
     );
 }
 
@@ -677,6 +695,44 @@ function main_skin_compare_post_datetime($a, $b) {
         return 0;
     }
     return ($a_time > $b_time) ? -1 : 1;
+}
+
+function main_skin_parallax_img_style($config, $layer_prefix) {
+    $pos_v = isset($config[$layer_prefix . '_pos_v']) ? $config[$layer_prefix . '_pos_v'] : 'center';
+    $pos_h = isset($config[$layer_prefix . '_pos_h']) ? $config[$layer_prefix . '_pos_h'] : 'center';
+    $offset_x = isset($config[$layer_prefix . '_offset_x']) ? (int)$config[$layer_prefix . '_offset_x'] : 0;
+    $offset_y = isset($config[$layer_prefix . '_offset_y']) ? (int)$config[$layer_prefix . '_offset_y'] : 0;
+
+    $styles = array();
+
+    switch ($pos_v) {
+        case 'top': $styles[] = 'top:0'; break;
+        case 'bottom': $styles[] = 'bottom:0'; break;
+        default: $styles[] = 'top:50%'; break;
+    }
+
+    switch ($pos_h) {
+        case 'left': $styles[] = 'left:0'; break;
+        case 'right': $styles[] = 'right:0'; break;
+        default: $styles[] = 'left:50%'; break;
+    }
+
+    $transforms = array();
+    if ($pos_h === 'center') {
+        $transforms[] = 'translateX(-50%)';
+    }
+    if ($pos_v === 'center') {
+        $transforms[] = 'translateY(-50%)';
+    }
+    if ($offset_x !== 0 || $offset_y !== 0) {
+        $transforms[] = 'translate(' . $offset_x . 'px,' . $offset_y . 'px)';
+    }
+
+    if (!empty($transforms)) {
+        $styles[] = 'transform:' . implode(' ', $transforms);
+    }
+
+    return implode(';', $styles);
 }
 
 function main_skin_is_admin() {
