@@ -82,6 +82,90 @@ switch ($action) {
         main_skin_json_ok(array());
         break;
 
+    case 'update_parallax':
+        $layers = array('fg', 'ng', 'bg');
+        $valid_v = array('top', 'center', 'bottom');
+        $valid_h = array('left', 'center', 'right');
+
+        foreach ($layers as $layer) {
+            $file_key = 'parallax_' . $layer . '_file';
+            $url_key = 'parallax_' . $layer . '_url';
+            $config_img_key = 'parallax_' . $layer . '_image';
+            $config_src_key = 'parallax_' . $layer . '_source_type';
+
+            if (isset($_FILES[$file_key]) && $_FILES[$file_key]['error'] === UPLOAD_ERR_OK) {
+                $uploaded = main_skin_upload_image($_FILES[$file_key], 'parallax', 'parallax_' . $layer);
+                if ($uploaded !== false) {
+                    if (!empty($config[$config_img_key]) && isset($config[$config_src_key]) && $config[$config_src_key] === 'file') {
+                        main_skin_delete_uploaded_asset($config[$config_img_key], 'parallax');
+                    }
+                    $config[$config_img_key] = $uploaded;
+                    $config[$config_src_key] = 'file';
+                }
+            } elseif (isset($_POST[$url_key])) {
+                $url = main_skin_image_url(trim($_POST[$url_key]));
+                $current = isset($config[$config_img_key]) ? $config[$config_img_key] : '';
+                if ($url !== $current) {
+                    if (!empty($current) && isset($config[$config_src_key]) && $config[$config_src_key] === 'file') {
+                        main_skin_delete_uploaded_asset($current, 'parallax');
+                    }
+                    $config[$config_img_key] = $url;
+                    $config[$config_src_key] = 'url';
+                }
+            }
+
+            $pos_v_key = 'parallax_' . $layer . '_pos_v';
+            $pos_h_key = 'parallax_' . $layer . '_pos_h';
+            $offset_x_key = 'parallax_' . $layer . '_offset_x';
+            $offset_y_key = 'parallax_' . $layer . '_offset_y';
+
+            if (isset($_POST[$pos_v_key])) {
+                $pv = $_POST[$pos_v_key];
+                $config[$pos_v_key] = in_array($pv, $valid_v) ? $pv : 'center';
+            }
+            if (isset($_POST[$pos_h_key])) {
+                $ph = $_POST[$pos_h_key];
+                $config[$pos_h_key] = in_array($ph, $valid_h) ? $ph : 'center';
+            }
+            if (isset($_POST[$offset_x_key])) {
+                $config[$offset_x_key] = max(-2000, min(2000, (int)$_POST[$offset_x_key]));
+            }
+            if (isset($_POST[$offset_y_key])) {
+                $config[$offset_y_key] = max(-2000, min(2000, (int)$_POST[$offset_y_key]));
+            }
+        }
+
+        if (!save_main_skin_config($config)) {
+            main_skin_json_error('패럴랙스 설정 저장에 실패했습니다.');
+        }
+
+        main_skin_json_ok(array());
+        break;
+
+    case 'delete_parallax_image':
+        $layer = isset($_POST['layer']) ? $_POST['layer'] : '';
+        $valid_layers = array('fg', 'ng', 'bg');
+        if (!in_array($layer, $valid_layers)) {
+            main_skin_json_error('유효하지 않은 레이어입니다.');
+        }
+
+        $config_img_key = 'parallax_' . $layer . '_image';
+        $config_src_key = 'parallax_' . $layer . '_source_type';
+
+        if (!empty($config[$config_img_key]) && isset($config[$config_src_key]) && $config[$config_src_key] === 'file') {
+            main_skin_delete_uploaded_asset($config[$config_img_key], 'parallax');
+        }
+
+        $config[$config_img_key] = '';
+        $config[$config_src_key] = 'url';
+
+        if (!save_main_skin_config($config)) {
+            main_skin_json_error('이미지 삭제에 실패했습니다.');
+        }
+
+        main_skin_json_ok(array());
+        break;
+
     default:
         main_skin_json_error('알 수 없는 액션입니다.');
 }

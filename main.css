@@ -166,6 +166,13 @@
 
 /* ── 스티커 오버레이 / 스티커 요소 ── */
 #retro-sticker-overlay { position: absolute; inset: 0; z-index: 15; pointer-events: none; }
+
+/* ── 패럴랙스 레이어 ── */
+.parallax-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.parallax-bg-layer { z-index: 0; }
+#parallax-ng-layer { z-index: 30; }
+#parallax-fg-layer { z-index: 35; }
+.parallax-layer img { position: absolute; display: block; pointer-events: none; user-select: none; }
 .retro-sticker { position: absolute; pointer-events: none; display: inline-block; }
 .retro-sticker img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; }
 
