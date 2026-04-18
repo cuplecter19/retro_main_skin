@@ -482,6 +482,11 @@ function main_skin_image_url($path_or_url) {
     return $path_or_url;
 }
 
+function main_skin_is_video($url) {
+    $ext = strtolower(pathinfo(trim((string)$url), PATHINFO_EXTENSION));
+    return ($ext === 'mp4');
+}
+
 function main_skin_generate_id() {
     if (function_exists('random_bytes')) {
         return bin2hex(random_bytes(8));
@@ -501,7 +506,7 @@ function main_skin_upload_image($file_arr, $type, $prefix) {
         return false;
     }
 
-    $allowed = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp');
+    $allowed = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'mp4');
     $ext = strtolower(pathinfo($file_arr['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, $allowed)) {
         return false;
@@ -512,7 +517,7 @@ function main_skin_upload_image($file_arr, $type, $prefix) {
         if ($finfo) {
             $mime = finfo_file($finfo, $file_arr['tmp_name']);
             finfo_close($finfo);
-            $allowed_mimes = array('image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/x-ms-bmp', 'image/x-bmp');
+            $allowed_mimes = array('image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/x-ms-bmp', 'image/x-bmp', 'video/mp4');
             if (!in_array($mime, $allowed_mimes)) {
                 return false;
             }
