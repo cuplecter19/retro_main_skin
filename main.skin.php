@@ -12,6 +12,8 @@ $main_skin_latest_html = render_main_latest($main_skin_config);
 $window_title = !empty($main_skin_config['window_title']) ? $main_skin_config['window_title'] : '최신글';
 $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['banner_title'] : '배너';
 ?>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=VT323&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap"></noscript>
 <link rel="stylesheet" href="<?php echo main_skin_esc(MAIN_SKIN_URL); ?>/main.css">
 
 <div id="retro-main-wrapper">
@@ -24,6 +26,8 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
        aria-hidden="true">
     <img src="<?php echo main_skin_esc($main_skin_config['parallax_bg_image']); ?>"
          alt=""
+         loading="lazy"
+         decoding="async"
          style="<?php echo main_skin_parallax_img_style($main_skin_config, 'parallax_bg'); ?>">
   </div>
   <?php } ?>
@@ -47,7 +51,8 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
          data-z-index="<?php echo (int)$sticker['z_index']; ?>"
          style="left:<?php echo main_skin_esc($sticker['left']); ?>;top:<?php echo main_skin_esc($sticker['top']); ?>;z-index:<?php echo (int)$sticker['z_index']; ?>;width:<?php echo $sticker_w; ?>;height:<?php echo $sticker_h; ?>;transform:<?php echo $transform_val; ?>;">
       <img src="<?php echo main_skin_esc($sticker['image']); ?>"
-           alt="<?php echo main_skin_esc($sticker['alt']); ?>">
+           alt="<?php echo main_skin_esc($sticker['alt']); ?>"
+           loading="lazy">
       <?php if ($main_skin_is_admin) { ?>
       <div class="sticker-handles">
         <button type="button" class="sticker-zup-btn"  data-id="<?php echo main_skin_esc($sticker['id']); ?>" title="z-index 올리기">▲</button>
@@ -85,9 +90,16 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
     <div id="retro-content-row">
       <div id="retro-polaroids">
         <div class="retro-polaroid polaroid-primary" style="transform:rotate(<?php echo main_skin_esc($main_skin_config['polaroid_1_rotate']); ?>deg);">
-          <?php if (!empty($main_skin_config['polaroid_1_image'])) { ?>
-          <img src="<?php echo main_skin_esc($main_skin_config['polaroid_1_image']); ?>" alt="<?php echo main_skin_esc($main_skin_config['polaroid_1_alt']); ?>">
+          <?php if (!empty($main_skin_config['polaroid_1_image'])) {
+              $_pol1_url = $main_skin_config['polaroid_1_image'];
+              if (main_skin_is_video($_pol1_url)) { ?>
+          <video autoplay loop muted playsinline>
+            <source src="<?php echo main_skin_esc($_pol1_url); ?>" type="video/mp4">
+          </video>
           <?php } else { ?>
+          <img src="<?php echo main_skin_esc($_pol1_url); ?>" alt="<?php echo main_skin_esc($main_skin_config['polaroid_1_alt']); ?>" loading="lazy">
+          <?php }
+          } else { ?>
           <div class="polaroid-placeholder">폴라로이드 1</div>
           <?php } ?>
           <?php if (!empty($main_skin_config['polaroid_1_caption'])) { ?>
@@ -96,9 +108,16 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
         </div>
 
         <div class="retro-polaroid polaroid-secondary" style="transform:rotate(<?php echo main_skin_esc($main_skin_config['polaroid_2_rotate']); ?>deg);">
-          <?php if (!empty($main_skin_config['polaroid_2_image'])) { ?>
-          <img src="<?php echo main_skin_esc($main_skin_config['polaroid_2_image']); ?>" alt="<?php echo main_skin_esc($main_skin_config['polaroid_2_alt']); ?>">
+          <?php if (!empty($main_skin_config['polaroid_2_image'])) {
+              $_pol2_url = $main_skin_config['polaroid_2_image'];
+              if (main_skin_is_video($_pol2_url)) { ?>
+          <video autoplay loop muted playsinline>
+            <source src="<?php echo main_skin_esc($_pol2_url); ?>" type="video/mp4">
+          </video>
           <?php } else { ?>
+          <img src="<?php echo main_skin_esc($_pol2_url); ?>" alt="<?php echo main_skin_esc($main_skin_config['polaroid_2_alt']); ?>" loading="lazy">
+          <?php }
+          } else { ?>
           <div class="polaroid-placeholder">폴라로이드 2</div>
           <?php } ?>
           <?php if (!empty($main_skin_config['polaroid_2_caption'])) { ?>
@@ -137,7 +156,7 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
                     <?php } else { foreach ($visible_banners as $banner) { ?>
                     <?php $banner_link = !empty($banner['link']) ? $banner['link'] : '#'; ?>
                     <a href="<?php echo main_skin_esc($banner_link); ?>" target="<?php echo main_skin_esc($banner['target']); ?>" rel="noopener noreferrer" class="banner-link">
-                      <img src="<?php echo main_skin_esc($banner['image']); ?>" alt="<?php echo main_skin_esc($banner['alt']); ?>" class="banner-img">
+                      <img src="<?php echo main_skin_esc($banner['image']); ?>" alt="<?php echo main_skin_esc($banner['alt']); ?>" class="banner-img" loading="lazy">
                     </a>
                     <?php } } ?>
                   </div>
@@ -159,6 +178,8 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
        aria-hidden="true">
     <img src="<?php echo main_skin_esc($main_skin_config['parallax_ng_image']); ?>"
          alt=""
+         loading="lazy"
+         decoding="async"
          style="<?php echo main_skin_parallax_img_style($main_skin_config, 'parallax_ng'); ?>">
   </div>
   <?php } ?>
@@ -172,6 +193,8 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
        aria-hidden="true">
     <img src="<?php echo main_skin_esc($main_skin_config['parallax_fg_image']); ?>"
          alt=""
+         loading="lazy"
+         decoding="async"
          style="<?php echo main_skin_parallax_img_style($main_skin_config, 'parallax_fg'); ?>">
   </div>
   <?php } ?>
@@ -244,7 +267,7 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
           <p class="win95-no-posts">등록된 에셋이 없습니다.</p>
           <?php } else { foreach ($main_skin_assets as $asset) { ?>
           <div class="admin-asset-item" id="admin-asset-<?php echo main_skin_esc($asset['id']); ?>">
-            <img src="<?php echo main_skin_esc($asset['image']); ?>" alt="<?php echo main_skin_esc($asset['alt']); ?>" class="admin-asset-thumb">
+            <img src="<?php echo main_skin_esc($asset['image']); ?>" alt="<?php echo main_skin_esc($asset['alt']); ?>" class="admin-asset-thumb" loading="lazy">
             <span class="admin-asset-alt"><?php echo main_skin_esc($asset['alt']); ?></span>
             <div class="admin-item-actions" style="flex-direction:row;">
               <button type="button" class="win95-action-btn asset-place-btn" data-id="<?php echo main_skin_esc($asset['id']); ?>">배치</button>
@@ -265,7 +288,7 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
             <input type="hidden" name="action" value="update_sticker">
             <input type="hidden" name="token" value="<?php echo main_skin_esc($main_skin_token); ?>">
             <input type="hidden" name="id" value="<?php echo main_skin_esc($sticker['id']); ?>">
-            <img src="<?php echo main_skin_esc($sticker['image']); ?>" alt="<?php echo main_skin_esc($sticker['alt']); ?>" class="admin-sticker-thumb">
+            <img src="<?php echo main_skin_esc($sticker['image']); ?>" alt="<?php echo main_skin_esc($sticker['alt']); ?>" class="admin-sticker-thumb" loading="lazy">
             <div class="admin-item-fields">
               <div class="admin-inline-fields">
                 <input type="text" name="alt" value="<?php echo main_skin_esc($sticker['alt']); ?>" placeholder="설명(alt)" style="min-width:160px;">
@@ -287,17 +310,17 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
           <input type="hidden" name="action" value="update_images">
           <input type="hidden" name="token" value="<?php echo main_skin_esc($main_skin_token); ?>">
           <h3 class="admin-section-title">폴라로이드 1</h3>
-          <div class="admin-field-row"><label>현재 이미지</label><?php if (!empty($main_skin_config['polaroid_1_image'])) { ?><img src="<?php echo main_skin_esc($main_skin_config['polaroid_1_image']); ?>" class="admin-preview-img"><?php } else { ?><span class="admin-none">없음</span><?php } ?></div>
+          <div class="admin-field-row"><label>현재 이미지</label><?php if (!empty($main_skin_config['polaroid_1_image'])) { $_p1_prev = $main_skin_config['polaroid_1_image']; if (main_skin_is_video($_p1_prev)) { ?><video src="<?php echo main_skin_esc($_p1_prev); ?>" class="admin-preview-img" autoplay loop muted playsinline></video><?php } else { ?><img src="<?php echo main_skin_esc($_p1_prev); ?>" class="admin-preview-img" loading="lazy"><?php } } else { ?><span class="admin-none">없음</span><?php } ?></div>
           <div class="admin-field-row"><label>URL</label><input type="text" name="pol1_url" value="<?php echo main_skin_esc($main_skin_config['polaroid_1_image']); ?>" style="width:320px;"></div>
-          <div class="admin-field-row"><label>업로드</label><input type="file" name="pol1_file" accept="image/*"></div>
+          <div class="admin-field-row"><label>업로드</label><input type="file" name="pol1_file" accept="image/*,video/mp4"></div>
           <div class="admin-field-row"><label>alt</label><input type="text" name="pol1_alt" value="<?php echo main_skin_esc($main_skin_config['polaroid_1_alt']); ?>"></div>
           <div class="admin-field-row"><label>캡션</label><input type="text" name="pol1_caption" value="<?php echo main_skin_esc($main_skin_config['polaroid_1_caption']); ?>"></div>
           <div class="admin-field-row"><label>회전</label><input type="number" step="0.1" name="pol1_rotate" value="<?php echo main_skin_esc($main_skin_config['polaroid_1_rotate']); ?>"></div>
 
           <h3 class="admin-section-title">폴라로이드 2</h3>
-          <div class="admin-field-row"><label>현재 이미지</label><?php if (!empty($main_skin_config['polaroid_2_image'])) { ?><img src="<?php echo main_skin_esc($main_skin_config['polaroid_2_image']); ?>" class="admin-preview-img"><?php } else { ?><span class="admin-none">없음</span><?php } ?></div>
+          <div class="admin-field-row"><label>현재 이미지</label><?php if (!empty($main_skin_config['polaroid_2_image'])) { $_p2_prev = $main_skin_config['polaroid_2_image']; if (main_skin_is_video($_p2_prev)) { ?><video src="<?php echo main_skin_esc($_p2_prev); ?>" class="admin-preview-img" autoplay loop muted playsinline></video><?php } else { ?><img src="<?php echo main_skin_esc($_p2_prev); ?>" class="admin-preview-img" loading="lazy"><?php } } else { ?><span class="admin-none">없음</span><?php } ?></div>
           <div class="admin-field-row"><label>URL</label><input type="text" name="pol2_url" value="<?php echo main_skin_esc($main_skin_config['polaroid_2_image']); ?>" style="width:320px;"></div>
-          <div class="admin-field-row"><label>업로드</label><input type="file" name="pol2_file" accept="image/*"></div>
+          <div class="admin-field-row"><label>업로드</label><input type="file" name="pol2_file" accept="image/*,video/mp4"></div>
           <div class="admin-field-row"><label>alt</label><input type="text" name="pol2_alt" value="<?php echo main_skin_esc($main_skin_config['polaroid_2_alt']); ?>"></div>
           <div class="admin-field-row"><label>캡션</label><input type="text" name="pol2_caption" value="<?php echo main_skin_esc($main_skin_config['polaroid_2_caption']); ?>"></div>
           <div class="admin-field-row"><label>회전</label><input type="number" step="0.1" name="pol2_rotate" value="<?php echo main_skin_esc($main_skin_config['polaroid_2_rotate']); ?>"></div>
@@ -331,7 +354,7 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
           <div class="admin-field-row">
             <label>현재 이미지</label>
             <?php if (!empty($main_skin_config[$img_key])) { ?>
-            <img src="<?php echo main_skin_esc($main_skin_config[$img_key]); ?>" class="admin-preview-img" id="parallax-preview-<?php echo $pl_key; ?>">
+            <img src="<?php echo main_skin_esc($main_skin_config[$img_key]); ?>" class="admin-preview-img" id="parallax-preview-<?php echo $pl_key; ?>" loading="lazy">
             <button type="button" class="win95-action-btn parallax-del-btn" data-layer="<?php echo $pl_key; ?>">삭제</button>
             <?php } else { ?>
             <span class="admin-none" id="parallax-preview-<?php echo $pl_key; ?>">없음</span>
@@ -355,8 +378,8 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
               <option value="right"<?php echo (isset($main_skin_config[$ph_key]) && $main_skin_config[$ph_key] === 'right') ? ' selected' : ''; ?>>우측</option>
             </select>
           </div>
-          <div class="admin-field-row"><label>가로 미세조정 (px)</label><input type="number" name="parallax_<?php echo $pl_key; ?>_offset_x" value="<?php echo (int)(isset($main_skin_config[$ox_key]) ? $main_skin_config[$ox_key] : 0); ?>" style="width:80px;"></div>
-          <div class="admin-field-row"><label>세로 미세조정 (px)</label><input type="number" name="parallax_<?php echo $pl_key; ?>_offset_y" value="<?php echo (int)(isset($main_skin_config[$oy_key]) ? $main_skin_config[$oy_key] : 0); ?>" style="width:80px;"></div>
+          <div class="admin-field-row"><label>가로 미세조정 (px)</label><input type="number" name="parallax_<?php echo $pl_key; ?>_offset_x" value="<?php echo (int)(isset($main_skin_config[$ox_key]) ? $main_skin_config[$ox_key] : 0); ?>"></div>
+          <div class="admin-field-row"><label>세로 미세조정 (px)</label><input type="number" name="parallax_<?php echo $pl_key; ?>_offset_y" value="<?php echo (int)(isset($main_skin_config[$oy_key]) ? $main_skin_config[$oy_key] : 0); ?>"></div>
           <?php } ?>
 
           <div class="admin-field-row"><label></label><button type="submit" class="win95-action-btn">패럴랙스 설정 저장</button></div>
@@ -371,7 +394,7 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
           <h3 class="admin-section-title">레트로 창 설정</h3>
           <div class="admin-field-row"><label>최신글 타이틀</label><input type="text" name="win_title" value="<?php echo main_skin_esc($window_title); ?>"></div>
           <div class="admin-field-row"><label>배너 타이틀</label><input type="text" name="banner_title" value="<?php echo main_skin_esc($banner_title); ?>"></div>
-          <div class="admin-field-row"><label>게시판 ID</label><input type="text" name="board_ids" value="<?php echo main_skin_esc($main_skin_config['latest_boards']); ?>" style="width:240px;" placeholder="free,gallery"></div>
+          <div class="admin-field-row"><label>게시판 ID</label><input type="text" name="board_ids" value="<?php echo main_skin_esc($main_skin_config['latest_boards']); ?>" style="width:240px;" placeholder="free,notice"></div>
           <div class="admin-field-row"><label>게시글 수</label><input type="number" name="limit" min="1" max="20" value="<?php echo (int)$main_skin_config['latest_rows']; ?>"></div>
           <div class="admin-field-row"><label></label><button type="submit" class="win95-action-btn">창 설정 저장</button></div>
         </form>
@@ -399,7 +422,7 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
             <input type="hidden" name="action" value="update_banner">
             <input type="hidden" name="token" value="<?php echo main_skin_esc($main_skin_token); ?>">
             <input type="hidden" name="index" value="<?php echo (int)$index; ?>">
-            <img src="<?php echo main_skin_esc($banner['image']); ?>" alt="<?php echo main_skin_esc($banner['alt']); ?>" class="admin-sticker-thumb">
+            <img src="<?php echo main_skin_esc($banner['image']); ?>" alt="<?php echo main_skin_esc($banner['alt']); ?>" class="admin-sticker-thumb" loading="lazy">
             <div class="admin-item-fields">
               <div class="admin-inline-fields">
                 <input type="text" name="banner_link" value="<?php echo main_skin_esc($banner['link']); ?>" placeholder="링크 URL">
@@ -423,6 +446,18 @@ $banner_title = !empty($main_skin_config['banner_title']) ? $main_skin_config['b
   </div>
   </div>
   <?php } ?>
+
+<?php
+// ── 캘린더 위젯 로드 ──
+$_cal_widget_path = '';
+if (defined('G5_SKIN_PATH')) {
+    $_cal_widget_path = G5_SKIN_PATH . '/board/calendar/calendar_widget.php';
+}
+if ($_cal_widget_path && file_exists($_cal_widget_path)) {
+    include_once($_cal_widget_path);
+}
+?>
+
 <!-- ★ script 블록을 최상단으로 이동: 어떤 조건과도 무관하게 항상 출력 -->
 <script>
 window.RETRO_SKIN_URL = '<?php echo addslashes(MAIN_SKIN_URL); ?>';
