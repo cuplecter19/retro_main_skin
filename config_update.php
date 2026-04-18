@@ -110,7 +110,7 @@ switch ($action) {
                         main_skin_delete_uploaded_asset($current, 'parallax');
                     }
                     $config[$config_img_key] = $url;
-                    $config[$config_src_key] = ($url === '') ? 'url' : 'url';
+                    $config[$config_src_key] = 'url';
                 }
             }
 

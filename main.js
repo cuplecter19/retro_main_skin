@@ -166,8 +166,8 @@
 
         var posV = layer.attr('data-pos-v') || 'center';
         var posH = layer.attr('data-pos-h') || 'center';
-        var offsetX = parseFloat(layer.attr('data-offset-x') || 0);
-        var offsetY = parseFloat(layer.attr('data-offset-y') || 0);
+        var offsetX = parseInt(layer.attr('data-offset-x') || 0, 10);
+        var offsetY = parseInt(layer.attr('data-offset-y') || 0, 10);
 
         var parts = [];
         if (posH === 'center') parts.push('translateX(-50%)');
